@@ -12,6 +12,7 @@ aiofiles = "*"
 beautifulsoup4 = "*"
 readability-lxml = "*"
 aiostream = "*"
+dragnet = "*"
 
 [requires]
 python_version = "3.7"
