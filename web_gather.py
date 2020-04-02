@@ -1,6 +1,9 @@
 import aiohttp
 import asyncio
 from aiostream import stream, pipe
+import logging
+
+logger = logging.getLogger("HTTP")
 
 '''
 WebGatherer
@@ -23,9 +26,18 @@ class AIOGatherer:
         #TODO: Error checking
         async with aiohttp.ClientSession() as session:
             async def fetch(url):
-                async with session.get(url) as resp:
-                    if resp.status == 200:
-                        return await resp.text()
+                try:
+                    async with session.get(url) as resp:
+                        if resp.status == 200:
+                            return await resp.text()
+                        else:
+                            logging.error(f"Server returned error status {resp.status}")
+                except aiohttp.InvalidURL:
+                    logger.error(f"Invalid URL: {url} ")
+                except aiohttp.ClientPayloadError:
+                    logging.error(f"Invalid payload")
+                except Exception as e:
+                    logging.error(f"Unexpected error: {e}")
             url_stream = stream.iterate(urls) 
             html_stream = stream.map(url_stream, fetch, ordered=True, task_limit=10)
 

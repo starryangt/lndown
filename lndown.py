@@ -16,12 +16,12 @@ if __name__ == "__main__":
         with open(args.index, 'r') as f:
             url = f.read()
         
-        urls = list(urls.split('\n'))
+        urls = list(url.split('\n'))
         
         g = web_gather.AIOGatherer()
         r = content_filter.ReadabilityFilter()
 
-        stuff = g.get(urls)
+        stuff = g.get(urls[:-1])
         final = r.process(stuff)
         
         mdata = {
