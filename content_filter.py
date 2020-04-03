@@ -34,7 +34,7 @@ class ReadabilityFilter:
     def process_one(self, content):
         try:
             doc = Document(content)
-            return ContentResult(doc.title(), doc.content())
+            return ContentResult(doc.title(), doc.summary())
         except Exception as e:
             logger.error(f"Readability failed on {content.title} with error {e}") 
             return ContentResult('', '')

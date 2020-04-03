@@ -15,6 +15,16 @@
   color: #2c3e50;
 }
 
+ul {
+  list-style-type: none;
+  text-align: left;
+}
+
+li{
+  border-bottom: 1px solid grey;
+  padding: 0.3em;
+}
+
 </style>
 
 <script>
