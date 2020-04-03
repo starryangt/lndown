@@ -53,7 +53,10 @@ class EPuB:
             #downloaded
             soup = BeautifulSoup(item.get('html', ''), 'html.parser')
             for img in soup.find_all('img'):
-                src = img['src']
+                if 'data-src' in img:
+                    src = img['data-src']
+                else:
+                    src = img['src']
                 image = Image(src)
                 img['src'] = image.new_src()
                 self.images.append(image)
@@ -76,11 +79,14 @@ class EPuB:
         async with aiohttp.ClientSession() as session:
             for image in self.images:
                 full_dir = tmp_dir / image.filepath()
-                async with session.get(image.src) as resp:
-                    if resp.status == 200:
-                        async with aiofiles.open(str(full_dir), 'wb') as f:
-                            await f.write(await resp.read())
-    
+                try:
+                    async with session.get(image.src) as resp:
+                        if resp.status == 200:
+                            async with aiofiles.open(str(full_dir), 'wb') as f:
+                                await f.write(await resp.read())
+                except Exception as e:
+                    print("Oh no ", e, " \n --> ", image)
+        
     async def async_compile(self, tmp_dir, output_dir):
         #first, make the file structure for the temp directory
         full_dir = tmp_dir / 'tmp'

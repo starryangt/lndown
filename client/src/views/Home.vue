@@ -52,9 +52,13 @@
           <v-row>
             <v-btn block v-on:click="compile">Compile</v-btn>
           </v-row>
-          </br>
+          <br/>
           <v-row>
             <v-btn block v-on:click="clear">Clear</v-btn>
+          </v-row>
+          <br/>
+          <v-row>
+            <v-progress-linear :value="value"></v-progress-linear>
           </v-row>
 
           <v-row fluid>
@@ -88,7 +92,8 @@
                 max-height="200px"
                 style="overflow: scroll"
                 >
-                </draggable>
+
+                <p v-for="line in logs" :key="line"> {{line}} </p>
               </v-card>
 
           </v-row>
@@ -104,7 +109,13 @@
 import HelloWorld from '@/components/HelloWorld.vue'
 import draggable from 'vuedraggable'
 
-import { eel } from './eel.js'
+let listeners = []
+eel.expose(log)
+function log(x){
+  for(let listen of listeners){
+    listen(x)
+  }
+}
 
 export default {
   name: 'Home',
@@ -119,7 +130,9 @@ export default {
     filename: '',
     scraper: 'http',
     parser: 'readability',
+    progress: 0,
     urls: [],
+    logs: ['Ready!'],
     scraper_items: [
       'http'
     ],
@@ -163,10 +176,14 @@ export default {
           'href': a.getAttribute("href")
         })
       }
+    },
+    log: function(e){
+      this.logs.push(e)
     }
   },
   mounted: function(){
     document.body.addEventListener('paste', this.handle_paste)
+    listeners.push(this.log)
   }
 }
 </script>
