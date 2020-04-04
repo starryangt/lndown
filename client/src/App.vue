@@ -25,6 +25,11 @@ li{
   padding: 0.3em;
 }
 
+#console{
+  text-align: left;
+  font-family: 'Courier New', Courier, monospace;
+}
+
 </style>
 
 <script>

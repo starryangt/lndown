@@ -8,7 +8,7 @@
               accordion
             >
               <v-expansion-panel>
-                <v-expansion-panel-header>More metadata</v-expansion-panel-header>
+                <v-expansion-panel-header>More metadata/settings</v-expansion-panel-header>
                 <v-expansion-panel-content>
                   <v-text-field
                     label="Publisher"
@@ -18,6 +18,23 @@
                     label="Filename"
                     v-model="filename"
                   ></v-text-field>
+                  Delay: <v-text-field
+                    label="Delay"
+                    hide-details
+                    single-line
+                    v-model="delay"
+                    type="number"
+                  >
+                  </v-text-field>
+                  Retries: <v-text-field
+                    label="Retry"
+                    hide-details
+                    single-line
+                    v-model="retry"
+                    type="number"
+                  >
+                  </v-text-field>
+
                 </v-expansion-panel-content>
               </v-expansion-panel>
             </v-expansion-panels>
@@ -32,6 +49,12 @@
             <v-text-field
               label="Author"
               v-model="author"
+            ></v-text-field>
+          </v-row>
+          <v-row>
+            <v-text-field
+              label="Cover URL"
+              v-model="cover"
             ></v-text-field>
           </v-row>
           
@@ -86,6 +109,7 @@
             <p>Console</p>
             <v-card
                 outlined
+                id="console"
                 class="mx-auto"
                 min-width="100%"
                 min-height="200px"
@@ -95,7 +119,6 @@
 
                 <p v-for="line in logs" :key="line"> {{line}} </p>
               </v-card>
-
           </v-row>
           
         </v-col>
@@ -128,13 +151,16 @@ export default {
     cover: '',
     publisher: '',
     filename: '',
-    scraper: 'http',
+    delay: 0,
+    retry: 0,
+    scraper: 'async',
     parser: 'readability',
     progress: 0,
     urls: [],
     logs: ['Ready!'],
     scraper_items: [
-      'http'
+      'async',
+      'sync'
     ],
     parser_items: [
       'readability',
@@ -153,6 +179,8 @@ export default {
         'filename': this.filename,
         'scraper': this.scraper,
         'parser': this.paarser,
+        'delay': this.delay,
+        'retry': this.retry
       }
       eel.compile(metadata, this.urls)
     },
@@ -160,8 +188,6 @@ export default {
       this.urls = []
     },
     handle_paste: function(e){
-      e.stopPropagation()
-      e.preventDefault()
 
       let clipboardData = e.clipboardData || window.clipboardData
       let pastedData = clipboardData.getData('text/html')

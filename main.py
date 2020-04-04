@@ -1,14 +1,15 @@
 import eel
-from web_gather import AIOGatherer
+from web_gather import AIOGatherer, RequestGatherer
 from content_filter import ReadabilityFilter, DragnetFilter
 from pathlib import Path
-from epub_writer import epub
+from epubwriter import EPuB
 import logging
 
 eel.init("client/dist")
 
 scraper_dict = {
-    "http": AIOGatherer
+    "sync": RequestGatherer,
+    "async": AIOGatherer
 }
 
 content_dict = {
@@ -25,11 +26,14 @@ def hello_world(x):
 @eel.expose
 def compile(metadata, urls):
     just_urls = map(lambda x: x['href'], urls)
+
+    delay = int(metadata.get("delay", 0))
+    retry = int(metadata.get("retry", 0))
     
-    scraper = scraper_dict.get(metadata.get("scraper", "http"), AIOGatherer)()
+    scraper = scraper_dict.get(metadata.get("scraper", "async"), AIOGatherer)(delay, retry, eel)
     content_filter = content_dict.get(metadata.get("parser", "readability"), ReadabilityFilter)()
 
-    eel.log("Grabbing sites...")
+    eel.log(f"Grabbing sites (delay {delay}, retry {retry} )...")
     try:
         HTML = scraper.get(just_urls)
     except Exception as e:
@@ -45,7 +49,7 @@ def compile(metadata, urls):
 
     content_list = [{'title': x.title, 'html': x.content} for x in filtered_content] 
     eel.log("Creating EPUB")
-    e = epub.EPuB(metadata, content_list)
+    e = EPuB(metadata, content_list)
     
     try: 
         working_dir = Path.cwd()
