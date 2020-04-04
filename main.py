@@ -1,6 +1,6 @@
 import eel
 from web_gather import AIOGatherer, RequestGatherer
-from content_filter import ReadabilityFilter, DragnetFilter
+from content_filter import ReadabilityFilter
 from pathlib import Path
 from epubwriter import EPuB
 import logging
@@ -13,8 +13,7 @@ scraper_dict = {
 }
 
 content_dict = {
-    "readability": ReadabilityFilter,
-    "dragnet": DragnetFilter
+    "readability": ReadabilityFilter
 }
 
 print(eel._js_functions)

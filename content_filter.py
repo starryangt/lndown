@@ -1,7 +1,5 @@
 from readability import Document
-from dragnet import extract_content
 from bs4 import BeautifulSoup
-import dragnet
 import logging
 
 logger = logging.getLogger("CONTENT")
@@ -39,20 +37,5 @@ class ReadabilityFilter:
             logger.error(f"Readability failed on {content.title} with error {e}") 
             return ContentResult('', '')
 
-    def process(self, contents):
-        return [self.process_one(x) for x in contents]
-
-class DragnetFilter:
-
-    def process_one(self, content):
-        try:
-            soup = BeautifulSoup(content)
-            title = soup.title
-            f_content = extract_content(content)
-            return ContentResult(title, f_content)
-        except Exception as e:
-            logger.error(f"Dragnet failed on {content.title} with error {e}") 
-            return ContentResult('', '')
-    
     def process(self, contents):
         return [self.process_one(x) for x in contents]

@@ -11,6 +11,7 @@ import os
 import zipfile
 import requests
 import base64
+import codecs
 
 class EPuB:
     '''
@@ -80,13 +81,16 @@ class EPuB:
     def write_chapters(self, tmp_dir):
         for chapter in self.chapters:
             full_dir = tmp_dir / chapter.filepath()
-            with open(str(full_dir), 'w') as f:
-                f.write(chapter.HTML)
+            try:
+                with codecs.open(str(full_dir), 'w', 'utf-8') as f:
+                    f.write(chapter.HTML)
+            except Exception as e:
+                print(f"Error {e} on {chapter}")
     
     def write_images(self, tmp_dir):
         for image in self.images:
-            r = requests.get(image.src, stream=True)
             try:
+                r = requests.get(image.src, stream=True)
                 if r.status_code == 200:
                     with open(tmp_dir / image.filepath(), 'wb') as f:
                         for chunk in r:
