@@ -17,7 +17,6 @@ content_dict = {
 }
 
 print(eel._js_functions)
-eel.log("fuck")
 @eel.expose
 def hello_world(x):
     print("Hello ", x)
@@ -28,6 +27,7 @@ def compile(metadata, urls):
 
     delay = int(metadata.get("delay", 0))
     retry = int(metadata.get("retry", 0))
+    print(metadata['cover'])
     
     scraper = scraper_dict.get(metadata.get("scraper", "async"), AIOGatherer)(delay, retry, eel)
     content_filter = content_dict.get(metadata.get("parser", "readability"), ReadabilityFilter)()
@@ -38,7 +38,7 @@ def compile(metadata, urls):
     except Exception as e:
         eel.log(f"Error: {e}")
         return
-
+    
     eel.log("Filtering content...")
     try:
         filtered_content = content_filter.process(HTML)
