@@ -180,7 +180,8 @@ export default {
         'scraper': this.scraper,
         'parser': this.paarser,
         'delay': this.delay,
-        'retry': this.retry
+        'retry': this.retry,
+        'cover': this.cover
       }
       eel.compile(metadata, this.urls)
     },
