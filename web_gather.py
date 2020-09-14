@@ -1,10 +1,8 @@
-import aiohttp
-import asyncio
-from aiostream import stream, pipe
 import requests
 import logging
 import time
 import eel
+from selenium import webdriver
 
 logger = logging.getLogger("HTTP")
 
@@ -46,49 +44,21 @@ class RequestGatherer:
 
         return result
 
+class SeleniumGatherer:
 
-class AIOGatherer:
     def __init__(self, delay=0, retry=0, logger=None):
-        self.delay = delay
-        self.retry = retry
+        self.driver = webdriver.Chrome()
         self.logger = logger
-
-    async def async_get(self, urls):
-        result = []
-
-        #TODO: Error checking
-        async with aiohttp.ClientSession() as session:
-            async def fetch(url):
-                if self.logger: self.logger.log(f"Grabbing {url}")
-                for _ in range(self.retry + 1):
-                    try:
-                        async with session.get(url) as resp:
-                            if resp.status == 200:
-                                return await resp.text()
-                            else:
-                                logging.error(f"Server returned error status {resp.status} on {url}")
-                                if self.logger: self.logger.log(f"Error on {url}")
-                                return ""
-                    except aiohttp.InvalidURL:
-                        logger.error(f"Invalid URL: {url} ")
-                    except aiohttp.ClientPayloadError:
-                        logging.error(f"Invalid payload")
-                    except Exception as e:
-                        logging.error(f"Unexpected error: {e}")
-                return ""
-            url_stream = stream.iterate(urls) 
-            html_stream = stream.map(url_stream, fetch, ordered=True, task_limit=10)
-
-            async with html_stream.stream() as streamer:
-                async for item in streamer:
-                    result.append(item)
-            return result
-
-    def get(self, urls):
-        loop = asyncio.get_event_loop()
-        try:
-            loop.run_until_complete(self.async_get(urls))
-        finally:
-            loop.close()
     
+    def get(self, urls):
+        result = []
+        for url in urls:
+            if not 'http' in url or not 'https' in url:
+                continue
+            if self.logger: self.logger.log(f"Grabbing {url}")
+            self.driver.get(url)
+            result.append(self.driver.page_source)
+        if self.logger: self.logger.log("Done")
+        return result
+
 

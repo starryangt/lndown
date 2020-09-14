@@ -1,5 +1,5 @@
 import eel
-from web_gather import AIOGatherer, RequestGatherer
+from web_gather import RequestGatherer, SeleniumGatherer
 from content_filter import ReadabilityFilter
 from pathlib import Path
 from epubwriter import EPuB
@@ -9,7 +9,7 @@ eel.init("client/dist")
 
 scraper_dict = {
     "sync": RequestGatherer,
-    "async": AIOGatherer
+    "selenium": SeleniumGatherer
 }
 
 content_dict = {
@@ -29,7 +29,7 @@ def compile(metadata, urls):
     retry = int(metadata.get("retry", 0))
     print(metadata['cover'])
     
-    scraper = scraper_dict.get(metadata.get("scraper", "async"), AIOGatherer)(delay, retry, eel)
+    scraper = scraper_dict.get(metadata.get("scraper", "sync"), RequestGatherer)(delay, retry, eel)
     content_filter = content_dict.get(metadata.get("parser", "readability"), ReadabilityFilter)()
 
     eel.log(f"Grabbing sites (delay {delay}, retry {retry} )...")

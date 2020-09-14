@@ -16,6 +16,8 @@ dragnet = "*"
 eel = "*"
 mako = "*"
 requests = "*"
+pyinstaller = "*"
+selenium = "*"
 
 [requires]
 python_version = "3.7"
