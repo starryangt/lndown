@@ -29,6 +29,7 @@ class RequestGatherer:
         def retry_get(retries, delay):
             for _ in range(retries + 1):
                 if self.logger: self.logger.log(f"Grabbing {url}")
+                if not url: return ""
                 r = requests.get(url)
                 if r.status_code == 200:
                     return r.text
@@ -47,8 +48,9 @@ class RequestGatherer:
 class SeleniumGatherer:
 
     def __init__(self, delay=0, retry=0, logger=None):
-        self.driver = webdriver.Chrome()
+        self.driver = webdriver.Safari()
         self.logger = logger
+        self.delay = delay
     
     def get(self, urls):
         result = []
@@ -57,6 +59,7 @@ class SeleniumGatherer:
                 continue
             if self.logger: self.logger.log(f"Grabbing {url}")
             self.driver.get(url)
+            if self.delay: time.sleep(self.delay)
             result.append(self.driver.page_source)
         if self.logger: self.logger.log("Done")
         return result
